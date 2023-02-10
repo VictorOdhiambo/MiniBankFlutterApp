@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bank_app/dashboard.dart';
+import 'package:bank_app/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -52,7 +53,7 @@ class _SignInState extends State<SignIn> {
     }
   }
 
-  User user = User('', '');
+  User user = User('', '', '', '');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,6 +127,7 @@ class _SignInState extends State<SignIn> {
                           return "Password is required";
                         }
                       },
+                      obscureText: true,
                       decoration: InputDecoration(
                           hintText: "Enter password...",
                           enabledBorder: OutlineInputBorder(
@@ -159,6 +161,31 @@ class _SignInState extends State<SignIn> {
                             if (_formKey.currentState!.validate()) {save()}
                           },
                           child: Text("Sign In",
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Colors.white)),
+                        ),
+                      )),
+                  Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Container(
+                        height: 50,
+                        width: 350,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.all(16.0),
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.blueGrey,
+                            textStyle: const TextStyle(fontSize: 20),
+                          ),
+                          onPressed: () => {
+                            Navigator.push(
+                                context,
+                                new MaterialPageRoute(
+                                    builder: (context) => const SignUp()))
+                          },
+                          child: Text("Sign Up",
                               style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,

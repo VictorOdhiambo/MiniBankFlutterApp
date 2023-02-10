@@ -1,7 +1,4 @@
 const router = require('express').Router();
-const verifyToken = require('./verifyToken');
-
-
 const Account = require('../model/Account')
 
 
