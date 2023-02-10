@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:bank_app/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -37,7 +38,6 @@ class _SignInState extends State<SignIn> {
           textColor: Colors.white,
           fontSize: 16.0);
 
-      print(res.body);
       // open dashboard
       Navigator.push(context,
           new MaterialPageRoute(builder: (context) => const Dashboard()));
