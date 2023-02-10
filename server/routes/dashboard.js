@@ -12,7 +12,7 @@ router.get('/balance/:id', async (req, res, next) => {
 // withdraw cash route
 router.put('/withdraw/:id', async (req, res, next) => {
     const {id} = req.params.id;
-    const amount = req.body.amount;
+    const amount = parseInt(req.body.amount);
     if (amount > 20000){
         return res.status(400).send('Exceeded maximum withdrawal per transaction');
     }
@@ -34,7 +34,7 @@ router.put('/withdraw/:id', async (req, res, next) => {
 // deposit cash route
 router.put('/deposit/:id', async (req, res, next) => {
     const {id} = req.params.id;
-    const amount = req.body.amount;
+    const amount = parseInt(req.body.amount);
     if (amount > 40000){
         return res.status(400).send('Exceeded maximum deposit per transaction');
     }
