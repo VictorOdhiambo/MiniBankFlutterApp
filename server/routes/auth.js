@@ -1,10 +1,14 @@
 const router = require("express").Router();
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 // import user model
 const User = require("../model/User");
-const { validateUserSignUp, validateUserLogon } = require("../validations/validate");
+const Account = require("../model/Account");
+const {
+  validateUserSignUp,
+  validateUserLogon,
+} = require("../validations/validate");
 
 // create an account route
 router.post("/create-account", async (req, res) => {
@@ -16,7 +20,7 @@ router.post("/create-account", async (req, res) => {
     name: req.body.name,
     email: req.body.email,
     ID: req.body.id,
-    password: req.body.password
+    password: req.body.password,
   });
 
   // create a hashed password
@@ -33,19 +37,40 @@ router.post("/create-account", async (req, res) => {
         return res
           .status(200)
           .send("A user with the given email already exists");
-        
-        // save user 
-        user.save()
-        .then(res.status(200).json({message: 'Account creation was successful'}))
-        .catch(err => res.json({message: 'Error saving user: ' + err}))
-        })
+
+      // save user
+      user
+        .save()
+        .then(
+          createAccountNumber(user.ID)
+          //res.status(200).json({ message: "Account creation was successful" })
+        )
+        .catch((err) => res.json({ message: "Error saving user: " + err }));
+    })
     .catch((err) => {});
 });
+
+const createAccountNumber = (userId) => {
+  const account = new Account({
+    accountNumber: Math.floor(Math.random() * 10000000000),
+    balance: 500, // minumum balance.
+    ID: userId,
+  });
+
+  account
+    .save()
+    .then((acc) => res.status(200).send("Account creation was successful"))
+    .catch((err) =>
+      res
+        .status(400)
+        .send("Account creation failed. Contact system administrator")
+    );
+};
 
 // sign in route
 router.post("/sign-in", (req, res) => {
   console.log(req.body);
-    // validate the payload
+  // validate the payload
   const { error } = validateUserLogon(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -54,29 +79,31 @@ router.post("/sign-in", (req, res) => {
     password: req.body.password,
   });
 
-   // validate user
-   User.findOne({ email: user.email })
-   .then((data) => {
-     if (data) {
-       // validate password
-       bycrypt
-         .compare(user.password, data.password)
-         .then((match) => {
-           if (!match)
-             return res.status(400).send("Login failed: Incorrect username or password");
-             const token = jwt.sign({id: data._id}, process.env.SECRET_TOKEN);
-           res.header('auth-token', token).send({token: token, ID: data.ID});
-         })
-         .catch((err) => res.status(400).send(err));
-     } else {
-       return res.status(400).send(`Login failed: Incorrect username or password`);
-     }
-   })
-   .catch((err) => {
-     res.send(err);
-   });
-
-
+  // validate user
+  User.findOne({ email: user.email })
+    .then((data) => {
+      if (data) {
+        // validate password
+        bycrypt
+          .compare(user.password, data.password)
+          .then((match) => {
+            if (!match)
+              return res
+                .status(400)
+                .send("Login failed: Incorrect username or password");
+            const token = jwt.sign({ id: data._id }, process.env.SECRET_TOKEN);
+            res.header("auth-token", token).send({ token: token, ID: data.ID });
+          })
+          .catch((err) => res.status(400).send(err));
+      } else {
+        return res
+          .status(400)
+          .send(`Login failed: Incorrect username or password`);
+      }
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
 module.exports = router;
