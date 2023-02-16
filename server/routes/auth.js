@@ -10,13 +10,18 @@ dotEnv.config();
 // import user model
 const User = require("../model/User");
 const Account = require("../model/Account");
+const Transaction = require("../model/Transaction");
+
+
 const {
   validateUserSignUp,
   validateUserLogon,
 } = require("../validations/validate");
 
+
 // create an account route
 router.post("/create-account", async (req, res) => {
+  console.log(req.body)
   // validate the payload
   const { error } = validateUserSignUp(req.body);
   if (error) return res.status(400).send(error.details[0].message);
@@ -34,8 +39,6 @@ router.post("/create-account", async (req, res) => {
 
   // update user password
   user.password = hashedPassword;
-
-
 
   // check if the user already has an account
   User.findOne({ email: req.body.email })
@@ -68,13 +71,25 @@ const createAccountNumber = (res, userId) => {
 
   account
     .save()
-    .then((acc) => res.status(200).send("Account creation was successful"))
+    .then((acc) => createUserTransactionalCount(res, userId))
     .catch((err) =>
       res
         .status(400)
         .send("Account creation failed. Contact system administrator")
     );
 };
+
+const createUserTransactionalCount = (res, _userId) => {
+  const transaction = new Transaction({
+    userId: _userId
+  });
+
+  transaction.save()
+  .then(data => res.status(200).send("Account creation was successful"))
+  .catch (err => res
+    .status(400)
+    .send("Account creation failed. Contact system administrator"))
+}
 
 // sign in route
 router.post("/sign-in", (req, res) => {
