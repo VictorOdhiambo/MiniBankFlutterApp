@@ -5,13 +5,19 @@ const cors = require('cors');
 const auth = require('./routes/auth');
 const dashboard = require('./routes/dashboard');
 
-const PORT = process.env.SERVER_PORT || 6500;
+const dotEnv = require("dotenv");
+
+
+dotEnv.config();
+
+const PORT = process.env.SERVER_PORT || 6800;
 
 const app = express();
 
 // connect to mongo db (localhost)
-mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true }, () => {
-  console.log(`Database connection was successful...`);
+mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true }, (err) => {
+  if(err) console.log(err) 
+  else console.log("mongdb is connected");
 });
 
 // middlewares

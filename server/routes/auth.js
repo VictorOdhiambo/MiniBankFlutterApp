@@ -1,6 +1,11 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const dotEnv = require("dotenv");
+
+
+dotEnv.config();
+
 
 // import user model
 const User = require("../model/User");
@@ -19,7 +24,7 @@ router.post("/create-account", async (req, res) => {
   const user = new User({
     name: req.body.name,
     email: req.body.email,
-    ID: req.body.id,
+    idNumber: req.body.idNumber,
     password: req.body.password,
   });
 
@@ -29,6 +34,8 @@ router.post("/create-account", async (req, res) => {
 
   // update user password
   user.password = hashedPassword;
+
+
 
   // check if the user already has an account
   User.findOne({ email: req.body.email })
@@ -42,19 +49,21 @@ router.post("/create-account", async (req, res) => {
       user
         .save()
         .then(
-          createAccountNumber(user.ID)
+          createAccountNumber(res, user._id)
           //res.status(200).json({ message: "Account creation was successful" })
         )
-        .catch((err) => res.json({ message: "Error saving user: " + err }));
+        .catch((err) => res.status(400).send("Error saving user: " + err ));
     })
-    .catch((err) => {});
+    .catch((err) => {
+      res.status(400).send("Error saving user: " + err )
+    });
 });
 
-const createAccountNumber = (userId) => {
+const createAccountNumber = (res, userId) => {
   const account = new Account({
     accountNumber: Math.floor(Math.random() * 10000000000),
     balance: 500, // minumum balance.
-    ID: userId,
+    idNumber: userId,
   });
 
   account
@@ -84,25 +93,28 @@ router.post("/sign-in", (req, res) => {
     .then((data) => {
       if (data) {
         // validate password
-        bycrypt
+        console.log(data);
+        bcrypt
           .compare(user.password, data.password)
           .then((match) => {
             if (!match)
               return res
                 .status(400)
                 .send("Login failed: Incorrect username or password");
-            const token = jwt.sign({ id: data._id }, process.env.SECRET_TOKEN);
-            res.header("auth-token", token).send({ token: token, ID: data.ID });
+            const token = jwt.sign({ id: data._id }, process.env.SERVER_SECRET_KEY);
+            res.header("auth-token", token).send({ token: token, ID: data._id });
           })
-          .catch((err) => res.status(400).send(err));
+          .catch((err) => res.status(400).send('Error signing in ' + err));
       } else {
+        console.log('login failed')
         return res
           .status(400)
           .send(`Login failed: Incorrect username or password`);
       }
     })
     .catch((err) => {
-      res.send(err);
+      console.log(err)
+      res.status(400).send(err);
     });
 });
 

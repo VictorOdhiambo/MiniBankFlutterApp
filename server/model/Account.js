@@ -1,19 +1,18 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const accountSchema = new Schema(
+const accountSchema = new mongoose.Schema(
   {
     accountNumber: {
       type: String,
       required: true,
     },
     balance: {
-      type: mongoose.Types.Decimal128,
+      type: Number,
       default: 0,
     },
-    ID: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    idNumber: {
+      type: String,
+      required: true,
     },
   },
   {

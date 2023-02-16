@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    ID: {
+    idNumber: {
       type: String,
       required: true,
     },
